@@ -1,6 +1,6 @@
 # University Event Management System
 
-A university event management module built as part of the **IUS Campus Management Platform**. This project uses **ASP.NET Core Web API** for the backend and will later use **React** for the frontend.
+A university event management module built as part of the **IUS Campus Management Platform**. This project uses **ASP.NET Core Web API** for the backend and will use **React** for the frontend.
 
 ## Current Status
 
@@ -20,6 +20,7 @@ University-Event-Management-System/
 ├── backend/
 │   └── IusEventManagement.Api/
 └── frontend/
+    └── ius-event-management-frontend/
 ```
 
 ## Prerequisites
@@ -28,6 +29,7 @@ Before running the backend, make sure these are installed:
 
 * **Git**
 * **.NET SDK 10**
+* **Node.js + npm**
 * **SQL Server LocalDB** or SQL Server
 * **VS Code** or Visual Studio
 
@@ -147,6 +149,55 @@ dotnet run
 * Swagger is configured at `/swagger`
 * OpenAPI JSON is available at `/openapi/v1.json`
 * The frontend setup will be added later
+
+## Frontend Setup
+
+### 1. Navigate to frontend folder
+
+```bash
+cd frontend/ius-event-management-frontend
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run the frontend
+
+```bash
+npm run dev
+```
+
+### 4. Open in browser
+
+```text
+http://localhost:5173
+```
+
+## Notes for Frontend Development
+
+* The frontend is built using **React + Vite**
+* Mock data is currently used (no backend required)
+* Main UI page is located in:
+
+```text
+src/pages/EventsPage.jsx
+```
+
+* Mock data is located in:
+
+```text
+src/mock/events.js
+```
+
+* Service layer (future API connection):
+
+```text
+src/services/eventService.js
+```
+
 
 ## Team
 1. Dzejlan Colakhodzic - dzeejlann
