@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Riad\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\IusEventManagement.Api.csproj": {}
+    "C:\\Users\\azeme\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\IusEventManagement.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Riad\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\IusEventManagement.Api.csproj": {
+    "C:\\Users\\azeme\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\IusEventManagement.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Riad\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\IusEventManagement.Api.csproj",
+        "projectUniqueName": "C:\\Users\\azeme\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\IusEventManagement.Api.csproj",
         "projectName": "IusEventManagement.Api",
-        "projectPath": "C:\\Users\\Riad\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\IusEventManagement.Api.csproj",
-        "packagesPath": "C:\\Users\\Riad\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Riad\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\obj\\",
+        "projectPath": "C:\\Users\\azeme\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\IusEventManagement.Api.csproj",
+        "packagesPath": "C:\\Users\\azeme\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\azeme\\OneDrive\\Documents\\GitHub\\University-Event-Management-System\\backend\\IusEventManagement.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Riad\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\azeme\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -44,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net10.0": {
@@ -88,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.104/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
