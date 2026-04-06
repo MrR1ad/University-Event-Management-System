@@ -10,8 +10,8 @@ The backend project is set up with:
 * OpenAPI support
 * Swagger UI
 * Entity Framework Core
-* SQL Server / LocalDB configuration
-* Initial project folder structure
+* Docker-based SQL Server setup for team development
+* Initial project structure for further expansion
 
 ## Project Structure
 
@@ -30,7 +30,7 @@ Before running the backend, make sure these are installed:
 * **Git**
 * **.NET SDK 10**
 * **Node.js + npm**
-* **SQL Server LocalDB** or SQL Server
+* Docker Desktop
 * **VS Code** or Visual Studio
 
 ## Backend Setup
@@ -42,19 +42,32 @@ git clone <your-repository-url>
 cd University-Event-Management-System
 ```
 
-### 2. Go to the backend project
+### 2. Start SQL SErver in Docker
+This project uses SQL Server in Docker on port 1433 so that both Windows and macOS team members can run the backend consistently.
+
+Run this command:
+```bash
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Password1!" -p 1433:1433 --name ius-event-db -d mcr.microsoft.com/mssql/server:2022-latest
+```
+If the container already exists and is stopped, start it with:
+
+```bash
+docker start ius-event-db
+```
+
+### 3. Go to the backend project
 
 ```bash
 cd backend/IusEventManagement.Api
 ```
 
-### 3. Restore packages
+### 4. Restore packages
 
 ```bash
 dotnet restore
 ```
 
-### 4. Apply database migrations
+### 5. Apply database migrations
 
 ```bash
 dotnet ef database update
@@ -109,19 +122,28 @@ Expected response:
 API is working
 ```
 
-## Connection String
+## Database Configuration
 
 The backend currently uses the connection string defined in `appsettings.json`.
 
 Example:
 
 ```json
+"AllowedHosts": "*",
 "ConnectionStrings": {
-  "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=IusEventDb;Trusted_Connection=True;TrustServerCertificate=True"
+  "DefaultConnection": "Data Source=localhost,1433;Initial Catalog=IusEventDb;User Id=SA;Password=Password1!;Connect Timeout=30;TrustServerCertificate=True"
 }
 ```
 
-If LocalDB is not available on your machine, replace it with your own SQL Server connection string.
+## Why Docker is used
+
+Using Docker avoids machine-specific setup issues such as:
+
+* Windows-only LocalDB
+* Different SQL Server installations
+* Inconsistent team environments
+
+This makes the backend easier to run for all group members, including macOS users.
 
 ## Useful Commands
 
