@@ -177,7 +177,8 @@ dotnet run
 ### 1. Navigate to frontend folder
 
 ```bash
-cd frontend/ius-event-management-frontend
+cd frontend/ius-frontend
+
 ```
 
 ### 2. Install dependencies
@@ -200,25 +201,48 @@ http://localhost:5173
 
 ## Notes for Frontend Development
 
-* The frontend is built using **React + Vite**
-* Mock data is currently used (no backend required)
-* Main UI page is located in:
+The frontend application is developed using React with Vite. At the current stage, mock data is used, and backend integration is prepared but not fully implemented.
 
-```text
-src/pages/EventsPage.jsx
-```
+Project structure overview:
 
-* Mock data is located in:
+- Entry point:  
+  src/main.jsx  
 
-```text
-src/mock/events.js
-```
+- Main application setup and routing:  
+  src/App.jsx  
 
-* Service layer (future API connection):
+- API configuration (future backend connection):  
+  src/api/index.js  
 
-```text
-src/services/eventService.js
-```
+- Authentication context:  
+  src/context/AuthContext.jsx  
+
+- Route protection:  
+  src/routes/ProtectedRoute.jsx  
+
+- Mock data source:  
+  src/mockData.js  
+
+- Reusable components:  
+  src/components/  
+  (includes DashboardLayout, Sidebar, Modal, Toast, EventCard, etc.)
+
+- Pages organized by roles:  
+  src/pages/
+
+  - Student pages:  
+    src/pages/student/  
+
+  - Admin pages:  
+    src/pages/admin/  
+
+  - Organizer pages:  
+    src/pages/organizer/  
+
+  - Authentication pages:  
+    src/pages/auth/  
+
+The structure follows a modular and role-based organization, making it scalable and easier to maintain. The API layer and context system are prepared for future backend integration.
 
 
 ## Team
