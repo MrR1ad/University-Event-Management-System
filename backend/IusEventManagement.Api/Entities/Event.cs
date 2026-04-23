@@ -14,9 +14,18 @@ namespace IusEventManagement.Api.Entities
 
         public int Capacity { get; set; }
 
-        public int VenueId { get; set; }
+        public string Category { get; set; } = string.Empty;
 
+        // "Upcoming" | "Ongoing" | "Past" | "Cancelled"
+        public string Status { get; set; } = "Upcoming";
+
+        // FK to Venue
+        public int VenueId { get; set; }
         public Venue Venue { get; set; } = null!;
+
+        // FK to Organizer (ApplicationUser)
+        public string OrganizerId { get; set; } = string.Empty;
+        public ApplicationUser Organizer { get; set; } = null!;
 
         public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
     }
