@@ -1,125 +1,181 @@
-// ─── API LAYER ───────────────────────────────────────────────────────────────
-// All functions here are STUBS using mock data.
-// When backend is ready:
-//   1. npm install axios
-//   2. Replace each function body with the real axios call shown in the comment
-//   3. Make sure the token header is set in each request
+// ─── REAL API LAYER ──────────────────────────────────────────────────────────
+// Replaces the mock layer. All functions now call the real .NET backend.
+// Base URL points to your backend dev server.
 
-import {
-  MOCK_EVENTS, MOCK_REGISTRATIONS, MOCK_USERS, MOCK_VENUES, MOCK_STATS
-} from '../mockData';
+import axios from 'axios';
 
-// Helper to simulate network delay
-const delay = (ms = 300) => new Promise(r => setTimeout(r, ms));
+const BASE_URL = 'http://localhost:5226/api';
 
-// ── AUTH ─────────────────────────────────────────────────────────────────────
-// Real: POST /api/auth/login   { email, password }
+// ── AXIOS INSTANCE ────────────────────────────────────────────────────────────
+// Automatically attaches the JWT token to every request
+const api = axios.create({ baseURL: BASE_URL });
+
+api.interceptors.request.use(config => {
+  const user = JSON.parse(localStorage.getItem('ius_user') || 'null');
+  if (user?.token) {
+    config.headers.Authorization = `Bearer ${user.token}`;
+  }
+  return config;
+});
+
+// If the backend returns 401 (token expired), clear local storage and reload
+api.interceptors.response.use(
+  res => res,
+  err => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('ius_user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(err);
+  }
+);
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+// POST /api/auth/login
 export async function apiLogin(email, password) {
-  await delay();
-  return null; // handled by AuthContext mock
+  const res = await api.post('/auth/login', { email, password });
+  return res.data; // AuthResponse: { token, userId, fullName, email, role }
 }
 
-// Real: POST /api/auth/register  { name, email, password, role }
-export async function apiRegister(data) {
-  await delay();
-  return null; // handled by AuthContext mock
+// POST /api/auth/register
+export async function apiRegister(fullName, email, password, role) {
+  const res = await api.post('/auth/register', { fullName, email, password, role });
+  return res.data;
 }
 
-// ── EVENTS ───────────────────────────────────────────────────────────────────
-// Real: GET /api/events
+// ── EVENTS ────────────────────────────────────────────────────────────────────
+// GET /api/events
 export async function getEvents() {
-  await delay();
-  return [...MOCK_EVENTS];
+  const res = await api.get('/events');
+  return res.data;
 }
 
-// Real: GET /api/events/:id
+// GET /api/events/:id
 export async function getEventById(id) {
-  await delay();
-  return MOCK_EVENTS.find(e => e.id === id) || null;
+  const res = await api.get(`/events/${id}`);
+  return res.data;
 }
 
-// Real: POST /api/events  (Organizer only)
+// POST /api/events  (Organizer/Admin)
 export async function createEvent(data) {
-  await delay();
-  return { ...data, id: Date.now(), registered: 0, status: 'Upcoming' };
+  const res = await api.post('/events', data);
+  return res.data;
 }
 
-// Real: PUT /api/events/:id  (Organizer/Admin)
+// PUT /api/events/:id  (Organizer/Admin)
 export async function updateEvent(id, data) {
-  await delay();
-  return { ...data, id };
+  const res = await api.put(`/events/${id}`, data);
+  return res.data;
 }
 
-// Real: DELETE /api/events/:id  (Organizer/Admin)
+// DELETE /api/events/:id  (Organizer/Admin)
 export async function deleteEvent(id) {
-  await delay();
+  await api.delete(`/events/${id}`);
   return { success: true };
 }
 
-// ── REGISTRATIONS ────────────────────────────────────────────────────────────
-// Real: GET /api/registrations?userId=:id
+// ── REGISTRATIONS ─────────────────────────────────────────────────────────────
+// GET /api/registrations?userId=:id
 export async function getMyRegistrations(userId) {
-  await delay();
-  const regs = MOCK_REGISTRATIONS.filter(r => r.userId === userId);
-  return regs.map(r => ({
+  const res = await api.get('/registrations', { params: { userId } });
+  // Shape the response to match what the frontend expects
+  return res.data.map(r => ({
     ...r,
-    event: MOCK_EVENTS.find(e => e.id === r.eventId),
+    eventId: r.eventId,
+    event: {
+      id:           r.eventId,
+      title:        r.eventTitle,
+      startDate:    r.startDate,
+      venueName:    r.venueName,
+      category:     r.category,
+      status:       r.status,
+    },
   }));
 }
 
-// Real: GET /api/registrations?eventId=:id
+// GET /api/registrations?eventId=:id
 export async function getRegistrationsByEvent(eventId) {
-  await delay();
-  return MOCK_REGISTRATIONS.filter(r => r.eventId === eventId);
+  const res = await api.get('/registrations', { params: { eventId } });
+  return res.data;
 }
 
-// Real: POST /api/registrations  { eventId, userId }
-export async function registerForEvent(eventId, userId) {
-  await delay();
-  return { id: Date.now(), eventId, userId, registeredAt: new Date().toISOString(), status: 'Confirmed', checkedIn: false };
+// POST /api/registrations
+export async function registerForEvent(eventId) {
+  const res = await api.post('/registrations', { eventId });
+  return res.data;
 }
 
-// Real: DELETE /api/registrations/:id
+// DELETE /api/registrations/:id
 export async function cancelRegistration(registrationId) {
-  await delay();
+  await api.delete(`/registrations/${registrationId}`);
   return { success: true };
 }
 
-// Real: PATCH /api/registrations/:id/checkin
+// PATCH /api/registrations/:id/checkin
 export async function checkInParticipant(registrationId) {
-  await delay();
-  return { success: true, checkedIn: true };
+  const res = await api.patch(`/registrations/${registrationId}/checkin`);
+  return res.data;
 }
 
-// ── VENUES ───────────────────────────────────────────────────────────────────
-// Real: GET /api/venues
+// ── VENUES ────────────────────────────────────────────────────────────────────
+// GET /api/venues
 export async function getVenues() {
-  await delay();
-  return [...MOCK_VENUES];
+  const res = await api.get('/venues');
+  return res.data;
 }
 
-// ── USERS (Admin only) ───────────────────────────────────────────────────────
-// Real: GET /api/users
+// POST /api/venues  (Admin)
+export async function createVenue(data) {
+  const res = await api.post('/venues', data);
+  return res.data;
+}
+
+// PUT /api/venues/:id  (Admin)
+export async function updateVenue(id, data) {
+  const res = await api.put(`/venues/${id}`, data);
+  return res.data;
+}
+
+// DELETE /api/venues/:id  (Admin)
+export async function deleteVenue(id) {
+  await api.delete(`/venues/${id}`);
+  return { success: true };
+}
+
+// ── USERS (Admin) ─────────────────────────────────────────────────────────────
+// GET /api/users
 export async function getUsers() {
-  await delay();
-  return [...MOCK_USERS];
+  const res = await api.get('/users');
+  return res.data;
 }
 
-// Real: PATCH /api/users/:id/role  { role }
+// PATCH /api/users/:id/role
 export async function updateUserRole(userId, role) {
-  await delay();
-  return { success: true };
+  const res = await api.patch(`/users/${userId}/role`, { role });
+  return res.data;
 }
 
-// Real: PATCH /api/users/:id/status  { status }
+// PATCH /api/users/:id/status  (Admin)
 export async function toggleUserStatus(userId, status) {
-  await delay();
+  // TODO: add a status field to ApplicationUser and a backend endpoint for this
+  // For now returns mock response since backend doesn't have this endpoint yet
   return { success: true };
 }
 
-// ── STATS (Admin only) ───────────────────────────────────────────────────────
-// Real: GET /api/stats
+// DELETE /api/users/:id
+export async function deleteUser(userId) {
+  await api.delete(`/users/${userId}`);
+  return { success: true };
+}
+
+// ── STATS (Admin) ─────────────────────────────────────────────────────────────
+// GET /api/stats
 export async function getStats() {
-  await delay();
-  return { ...MOCK_STATS };
+  const res = await api.get('/stats');
+  return {
+    totalEvents:        res.data.totalEvents,
+    upcomingEvents:     res.data.upcomingEvents,
+    totalUsers:         res.data.totalUsers,
+    totalRegistrations: res.data.totalRegistrations,
+  };
 }

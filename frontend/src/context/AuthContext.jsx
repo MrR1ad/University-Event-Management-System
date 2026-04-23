@@ -1,13 +1,7 @@
 import { createContext, useContext, useState } from 'react';
+import { apiLogin, apiRegister } from '../api/index';
 
 const AuthContext = createContext(null);
-
-// Mock users for frontend dev — replace with real API calls later
-const MOCK_USERS = [
-  { id: 1, name: 'Admin User',    email: 'admin@ius.edu.ba',     role: 'Admin',     token: 'mock-admin-token' },
-  { id: 2, name: 'Sara Kovač',    email: 'organizer@ius.edu.ba', role: 'Organizer', token: 'mock-org-token' },
-  { id: 3, name: 'Amir Hodžić',   email: 'student@ius.edu.ba',   role: 'Student',   token: 'mock-student-token' },
-];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -15,21 +9,35 @@ export function AuthProvider({ children }) {
     return saved ? JSON.parse(saved) : null;
   });
 
-  // TODO: replace body with real API call → api/auth.js → login()
-  function login(email, password) {
-    const found = MOCK_USERS.find(u => u.email === email);
-    if (!found) throw new Error('User not found');
-    localStorage.setItem('ius_user', JSON.stringify(found));
-    setUser(found);
-    return found;
+  // Calls POST /api/auth/login → gets back { token, userId, fullName, email, role }
+  async function login(email, password) {
+    const data = await apiLogin(email, password);
+    // Store in the same shape the rest of the app already expects
+    const userObj = {
+      id:    data.userId,
+      name:  data.fullName,
+      email: data.email,
+      role:  data.role,
+      token: data.token,
+    };
+    localStorage.setItem('ius_user', JSON.stringify(userObj));
+    setUser(userObj);
+    return userObj;
   }
 
-  // TODO: replace body with real API call → api/auth.js → register()
-  function register(name, email, password, role) {
-    const newUser = { id: Date.now(), name, email, role, token: 'mock-token' };
-    localStorage.setItem('ius_user', JSON.stringify(newUser));
-    setUser(newUser);
-    return newUser;
+  // Calls POST /api/auth/register
+  async function register(name, email, password, role) {
+    const data = await apiRegister(name, email, password, role);
+    const userObj = {
+      id:    data.userId,
+      name:  data.fullName,
+      email: data.email,
+      role:  data.role,
+      token: data.token,
+    };
+    localStorage.setItem('ius_user', JSON.stringify(userObj));
+    setUser(userObj);
+    return userObj;
   }
 
   function logout() {

@@ -11,16 +11,17 @@ export default function Register() {
 
   function set(f, v) { setForm(x => ({ ...x, [f]: v })); }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     if (form.password !== form.confirm) { setError('Passwords do not match'); return; }
     setLoading(true);
     try {
-      const user = register(form.name, form.email, form.password, form.role);
+      const user = await register(form.name, form.email, form.password, form.role);
       navigate(`/${user.role.toLowerCase()}`);
     } catch (err) {
-      setError(err.message);
+      const msg = err.response?.data?.message || err.message || 'Registration failed';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -48,20 +49,24 @@ export default function Register() {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Full Name</label>
-              <input placeholder="Amir Hodžić" value={form.name} onChange={e => set('name', e.target.value)} required />
+              <input placeholder="Amir Hodžić" value={form.name}
+                onChange={e => set('name', e.target.value)} required />
             </div>
             <div className="form-group">
               <label>Email</label>
-              <input type="email" placeholder="your@ius.edu.ba" value={form.email} onChange={e => set('email', e.target.value)} required />
+              <input type="email" placeholder="your@ius.edu.ba" value={form.email}
+                onChange={e => set('email', e.target.value)} required />
             </div>
             <div className="form-row">
               <div className="form-group">
                 <label>Password</label>
-                <input type="password" placeholder="••••••••" value={form.password} onChange={e => set('password', e.target.value)} required />
+                <input type="password" placeholder="Min 6 chars" value={form.password}
+                  onChange={e => set('password', e.target.value)} required />
               </div>
               <div className="form-group">
                 <label>Confirm</label>
-                <input type="password" placeholder="••••••••" value={form.confirm} onChange={e => set('confirm', e.target.value)} required />
+                <input type="password" placeholder="••••••••" value={form.confirm}
+                  onChange={e => set('confirm', e.target.value)} required />
               </div>
             </div>
             <div className="form-group">
@@ -80,13 +85,16 @@ export default function Register() {
               }}>{error}</div>
             )}
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '13px' }} disabled={loading}>
+            <button type="submit" className="btn btn-primary"
+              style={{ width: '100%', justifyContent: 'center', padding: '13px' }}
+              disabled={loading}>
               {loading ? 'Creating account…' : 'Create Account →'}
             </button>
           </form>
 
           <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#888', marginTop: 20 }}>
-            Already have an account? <Link to="/login" style={{ color: 'var(--accent)', fontWeight: 700 }}>Sign in</Link>
+            Already have an account?{' '}
+            <Link to="/login" style={{ color: 'var(--accent)', fontWeight: 700 }}>Sign in</Link>
           </p>
         </div>
       </div>

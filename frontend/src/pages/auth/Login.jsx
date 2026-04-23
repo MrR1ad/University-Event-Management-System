@@ -11,15 +11,17 @@ export default function Login() {
 
   function set(f, v) { setForm(x => ({ ...x, [f]: v })); }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const user = login(form.email, form.password);
+      const user = await login(form.email, form.password);
       navigate(`/${user.role.toLowerCase()}`);
     } catch (err) {
-      setError(err.message);
+      // Real API returns error in err.response.data.message
+      const msg = err.response?.data?.message || err.message || 'Login failed';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -35,34 +37,23 @@ export default function Login() {
           background: 'rgba(255,255,255,0.55)',
           backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid rgba(255,255,255,0.8)',
-          borderRadius: 45, padding: clamp(32, 48),
+          borderRadius: 45, padding: 40,
           boxShadow: '0 40px 100px rgba(0,0,0,0.1)',
         }}>
-          {/* Logo */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32 }}>
             <div className="ius-logo" style={{ width: 60, height: 60, fontSize: 16, borderRadius: 18, marginBottom: 12 }}>IUS</div>
             <h2 style={{ margin: 0, fontWeight: 800, color: '#2d3436', fontSize: '1.6rem' }}>Welcome back</h2>
             <p style={{ margin: '6px 0 0', color: '#888', fontSize: '0.9rem' }}>Sign in to Event Management</p>
           </div>
 
-          {/* Demo quick-login */}
+          {/* Default admin hint */}
           <div style={{
-            background: 'rgba(255,255,255,0.5)', border: '1.5px dashed rgba(0,51,102,0.2)',
-            borderRadius: 20, padding: 16, marginBottom: 24, textAlign: 'center'
+            background: 'rgba(0,51,102,0.05)', border: '1.5px dashed rgba(0,51,102,0.2)',
+            borderRadius: 20, padding: 14, marginBottom: 24, textAlign: 'center'
           }}>
-            <p style={{ fontSize: '0.78rem', color: '#888', marginBottom: 10, fontWeight: 600 }}>Quick demo login</p>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-              {[
-                { label: 'Admin',     email: 'admin@ius.edu.ba'     },
-                { label: 'Organizer', email: 'organizer@ius.edu.ba' },
-                { label: 'Student',   email: 'student@ius.edu.ba'   },
-              ].map(r => (
-                <button key={r.label} className="btn btn-ghost btn-sm"
-                  onClick={() => setForm({ email: r.email, password: 'demo' })}>
-                  {r.label}
-                </button>
-              ))}
-            </div>
+            <p style={{ fontSize: '0.78rem', color: '#636e72', fontWeight: 600, margin: 0 }}>
+              Default admin: <strong>admin@ius.edu.ba</strong> / <strong>Admin123!</strong>
+            </p>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -85,19 +76,19 @@ export default function Login() {
               }}>{error}</div>
             )}
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '13px' }} disabled={loading}>
+            <button type="submit" className="btn btn-primary"
+              style={{ width: '100%', justifyContent: 'center', padding: '13px' }}
+              disabled={loading}>
               {loading ? 'Signing in…' : 'Sign In →'}
             </button>
           </form>
 
           <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#888', marginTop: 20 }}>
-            No account? <Link to="/register" style={{ color: 'var(--accent)', fontWeight: 700 }}>Register here</Link>
+            No account?{' '}
+            <Link to="/register" style={{ color: 'var(--accent)', fontWeight: 700 }}>Register here</Link>
           </p>
         </div>
       </div>
     </div>
   );
 }
-
-// tiny helper for inline style readability
-function clamp(min, max) { return `clamp(${min}px, 5vw, ${max}px)`; }

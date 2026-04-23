@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/DashboardLayout';
-import { getVenues } from '../../api/index';
+import { getVenues, createVenue, updateVenue, deleteVenue } from '../../api/index';
 import Modal from '../../components/Modal';
 import { useToast } from '../../components/Toast';
 
@@ -9,31 +9,56 @@ export default function AdminVenues() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: '', location: '', capacity: '' });
   const [editId, setEditId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => { getVenues().then(setVenues); }, []);
 
   function set(f, v) { setForm(x => ({ ...x, [f]: v })); }
 
-  function openCreate() { setForm({ name: '', location: '', capacity: '' }); setEditId(null); setShowModal(true); }
-  function openEdit(v)   { setForm({ name: v.name, location: v.location, capacity: v.capacity }); setEditId(v.id); setShowModal(true); }
-
-  function handleSave(e) {
-    e.preventDefault();
-    if (editId) {
-      setVenues(vs => vs.map(v => v.id === editId ? { ...v, ...form, capacity: Number(form.capacity) } : v));
-      toast('Venue updated');
-    } else {
-      setVenues(vs => [...vs, { id: Date.now(), ...form, capacity: Number(form.capacity) }]);
-      toast('Venue created');
-    }
-    setShowModal(false);
+  function openCreate() {
+    setForm({ name: '', location: '', capacity: '' });
+    setEditId(null);
+    setShowModal(true);
   }
 
-  function handleDelete(id) {
+  function openEdit(v) {
+    setForm({ name: v.name, location: v.location, capacity: v.capacity });
+    setEditId(v.id);
+    setShowModal(true);
+  }
+
+  async function handleSave(e) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload = { name: form.name, location: form.location, capacity: Number(form.capacity) };
+      if (editId) {
+        const updated = await updateVenue(editId, payload);
+        setVenues(vs => vs.map(v => v.id === editId ? updated : v));
+        toast('Venue updated');
+      } else {
+        const created = await createVenue(payload);
+        setVenues(vs => [...vs, created]);
+        toast('Venue created');
+      }
+      setShowModal(false);
+    } catch (err) {
+      toast(err.response?.data?.message || 'Failed to save venue', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(id) {
     if (!confirm('Delete this venue?')) return;
-    setVenues(vs => vs.filter(v => v.id !== id));
-    toast('Venue deleted');
+    try {
+      await deleteVenue(id);
+      setVenues(vs => vs.filter(v => v.id !== id));
+      toast('Venue deleted');
+    } catch (err) {
+      toast('Failed to delete venue', 'error');
+    }
   }
 
   return (
@@ -59,11 +84,17 @@ export default function AdminVenues() {
               <p style={{ fontSize: '0.85rem', color: '#888', marginBottom: 20 }}>{v.location}</p>
               <div className="soft-card-actions">
                 <button className="soft-action-btn" onClick={() => openEdit(v)}>Edit</button>
-                <button className="soft-action-btn primary" onClick={() => handleDelete(v.id)}
+                <button className="soft-action-btn" onClick={() => handleDelete(v.id)}
                   style={{ background: '#fff5f5', color: '#e74c3c' }}>Delete</button>
               </div>
             </div>
           ))}
+
+          {venues.length === 0 && (
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', color: '#b2bec3', padding: 60 }}>
+              No venues yet. Click <strong>+ Add Venue</strong> to create one.
+            </div>
+          )}
         </div>
       </div>
 
@@ -86,8 +117,12 @@ export default function AdminVenues() {
                 onChange={e => set('capacity', e.target.value)} required min="1" />
             </div>
             <div className="flex gap-3" style={{ justifyContent: 'flex-end', marginTop: 8 }}>
-              <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-              <button type="submit" className="btn btn-primary">Save Venue</button>
+              <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? 'Saving…' : 'Save Venue'}
+              </button>
             </div>
           </form>
         </Modal>
