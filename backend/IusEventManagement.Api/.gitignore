@@ -9,12 +9,12 @@ obj/
 *.suo
 *.log
 
-.env
-
 # Node
 node_modules
 dist
 dist-ssr
+
+.env
 
 # Logs
 logs
