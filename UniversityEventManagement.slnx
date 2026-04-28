@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="UniversityEventManagement.Api/UniversityEventManagement.Api.csproj" />
+  <Project Path="UniversityEventManagement.Application/UniversityEventManagement.Application.csproj" />
+  <Project Path="UniversityEventManagement.Domain/UniversityEventManagement.Domain.csproj" />
+  <Project Path="UniversityEventManagement.Infrastructure/UniversityEventManagement.Infrastructure.csproj" />
+</Solution>
