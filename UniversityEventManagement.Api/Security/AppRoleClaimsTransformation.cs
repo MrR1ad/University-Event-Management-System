@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using System.Text.RegularExpressions;
 
 namespace UniversityEventManagement.Api.Security;
 
@@ -19,11 +20,7 @@ public sealed class AppRoleClaimsTransformation : IClaimsTransformation
             return Task.FromResult(principal);
         }
 
-        var email =
-            principal.FindFirst("preferred_username")?.Value ??
-            principal.FindFirst("upn")?.Value ??
-            principal.FindFirst(ClaimTypes.Email)?.Value ??
-            string.Empty;
+        var email = GetEmailFromClaims(principal);
 
         var existingRoles = principal
             .FindAll(ClaimTypes.Role)
@@ -37,11 +34,8 @@ public sealed class AppRoleClaimsTransformation : IClaimsTransformation
             AddRoleIfMissing(identity, role);
         }
 
-        if (!existingRoles.Any())
-        {
-            var mappedRole = GetMappedRole(email);
-            AddRoleIfMissing(identity, mappedRole);
-        }
+        var mappedRole = GetMappedRole(email);
+        AddRoleIfMissing(identity, mappedRole);
 
         return Task.FromResult(principal);
     }
@@ -80,4 +74,36 @@ public sealed class AppRoleClaimsTransformation : IClaimsTransformation
             identity.AddClaim(new Claim(ClaimTypes.Role, role));
         }
     }
+
+    private static string GetEmailFromClaims(ClaimsPrincipal principal)
+{
+    var email =
+        principal.FindFirst("preferred_username")?.Value ??
+        principal.FindFirst("upn")?.Value ??
+        principal.FindFirst(ClaimTypes.Upn)?.Value ??
+        principal.FindFirst(ClaimTypes.Email)?.Value ??
+        principal.FindFirst("email")?.Value ??
+        principal.FindFirst("unique_name")?.Value ??
+        string.Empty;
+
+    if (!string.IsNullOrWhiteSpace(email) && email.Contains('@'))
+    {
+        return email.Trim().ToLowerInvariant();
+    }
+
+    var name =
+        principal.FindFirst("name")?.Value ??
+        principal.Identity?.Name ??
+        string.Empty;
+
+    var match = Regex.Match(
+        name,
+        @"[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}",
+        RegexOptions.IgnoreCase
+    );
+
+    return match.Success
+        ? match.Value.Trim().ToLowerInvariant()
+        : string.Empty;
+}
 }
