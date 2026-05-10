@@ -1,8 +1,13 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using UniversityEventManagement.Infrastructure.Data;
+using Microsoft.Identity.Web;
 using Serilog;
+using UniversityEventManagement.Api.Security;
+using UniversityEventManagement.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration
@@ -14,33 +19,64 @@ builder.Host.UseSerilog((context, services, configuration) =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlServerOptionsAction: sqlOptions =>
-        {
-            sqlOptions.EnableRetryOnFailure();
-        }));
+        sqlOptions => sqlOptions.EnableRetryOnFailure()
+    )
+);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+builder.Services.AddTransient<IClaimsTransformation, AppRoleClaimsTransformation>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+
+    options.AddPolicy("OrganizerOnly", policy =>
+        policy.RequireRole("Admin", "Organizer"));
+
+    options.AddPolicy("StudentOnly", policy =>
+        policy.RequireRole("Admin", "Organizer", "Student"));
+});
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate =
         "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
 });
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger();  
+    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
+app.UseCors("Frontend");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

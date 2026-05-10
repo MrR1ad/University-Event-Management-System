@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "./components/Toast";
 
+import RoleRedirect from "./auth/RoleRedirect";
+import ProtectedRoute from "./auth/ProtectedRoute";
+
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -23,32 +26,125 @@ export default function App() {
       <ToastContainer />
 
       <Routes>
-        <Route path="/" element={<Navigate to="/student" replace />} />
+        <Route path="/" element={<RoleRedirect />} />
+        <Route path="/auth" element={<RoleRedirect />} />
 
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/events" element={<AdminEvents />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/venues" element={<AdminVenues />} />
-        <Route path="/admin/reports" element={<AdminReports />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/events"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminEvents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/venues"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminVenues />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/reports"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminReports />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/organizer" element={<OrganizerDashboard />} />
-        <Route path="/organizer/events" element={<OrganizerEvents />} />
-        <Route path="/organizer/events/create" element={<EventForm />} />
+        <Route
+          path="/organizer"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer"]}>
+              <OrganizerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizer/events"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer"]}>
+              <OrganizerEvents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizer/events/new"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer"]}>
+              <EventForm />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/organizer/events/:id"
-          element={<OrganizerEventDetail />}
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer"]}>
+              <OrganizerEventDetail />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/organizer/events/:id/edit" element={<EventForm />} />
+        <Route
+          path="/organizer/events/:id/edit"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer"]}>
+              <EventForm />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/student" element={<StudentDashboard />} />
-        <Route path="/student/events" element={<StudentEvents />} />
-        <Route path="/student/events/:id" element={<StudentEventDetail />} />
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer", "Student"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/events"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer", "Student"]}>
+              <StudentEvents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/events/:id"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer", "Student"]}>
+              <StudentEventDetail />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/student/registrations"
-          element={<StudentRegistrations />}
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "Organizer", "Student"]}>
+              <StudentRegistrations />
+            </ProtectedRoute>
+          }
         />
 
-        <Route path="*" element={<Navigate to="/student" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

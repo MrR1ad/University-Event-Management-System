@@ -1,11 +1,52 @@
 import axios from "axios";
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { loginRequest } from "../auth/msalConfig";
 
 const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5064/api";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+
+let msalInstance = null;
+
+export function setAuthInstance(instance) {
+  msalInstance = instance;
+}
 
 const api = axios.create({
   baseURL: BASE_URL,
 });
+
+api.interceptors.request.use(async (config) => {
+  if (!msalInstance) {
+    return config;
+  }
+
+  const accounts = msalInstance.getAllAccounts();
+
+  if (!accounts.length) {
+    return config;
+  }
+
+  try {
+    const response = await msalInstance.acquireTokenSilent({
+      ...loginRequest,
+      account: accounts[0],
+    });
+
+    config.headers.Authorization = `Bearer ${response.accessToken}`;
+    return config;
+  } catch (error) {
+    if (error instanceof InteractionRequiredAuthError) {
+      await msalInstance.acquireTokenRedirect(loginRequest);
+    }
+
+    return Promise.reject(error);
+  }
+});
+
+export async function getMe() {
+  const res = await api.get("/auth/me");
+  return res.data;
+}
 
 // ── EVENTS ────────────────────────────────────────────────────────────────────
 
