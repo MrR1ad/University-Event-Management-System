@@ -7,7 +7,7 @@ namespace UniversityEventManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Policy = "AdminOnly")]
 public class UsersController : ControllerBase
 {
     [HttpGet]

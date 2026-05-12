@@ -5,18 +5,22 @@ using UniversityEventManagement.Application.DTOs;
 
 namespace UniversityEventManagement.Api.Controllers;
 
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class VenuesController : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = "AnyAppRole")]
+
     public IActionResult GetAll()
     {
         return Ok(MockDataStore.Venues);
     }
 
     [HttpPost]
+    [Authorize(Policy = "AdminOnly")]
     public IActionResult Create(VenueDto request)
     {
         request.Id = MockDataStore.NextVenueId;
@@ -25,7 +29,10 @@ public class VenuesController : ControllerBase
         return Ok(request);
     }
 
+
+
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "AdminOnly")]
     public IActionResult Update(int id, VenueDto request)
     {
         var venue = MockDataStore.Venues.FirstOrDefault(v => v.Id == id);
@@ -47,7 +54,9 @@ public class VenuesController : ControllerBase
         return Ok(venue);
     }
 
+
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "AdminOnly")]
     public IActionResult Delete(int id)
     {
         var venue = MockDataStore.Venues.FirstOrDefault(v => v.Id == id);

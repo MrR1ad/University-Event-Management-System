@@ -46,9 +46,18 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin"));
 
     options.AddPolicy("OrganizerOnly", policy =>
-        policy.RequireRole("Admin", "Organizer"));
+        policy.RequireRole("Organizer"));
 
     options.AddPolicy("StudentOnly", policy =>
+        policy.RequireRole("Student"));
+
+    options.AddPolicy("AdminOrOrganizer", policy =>
+        policy.RequireRole("Admin", "Organizer"));
+
+    options.AddPolicy("AdminOrStudent", policy =>
+        policy.RequireRole("Admin", "Student"));
+
+    options.AddPolicy("AnyAppRole", policy =>
         policy.RequireRole("Admin", "Organizer", "Student"));
 });
 

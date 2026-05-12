@@ -114,7 +114,7 @@ export default function App() {
         <Route
           path="/student"
           element={
-            <ProtectedRoute allowedRoles={["Admin", "Organizer", "Student"]}>
+            <ProtectedRoute allowedRoles={["Admin", "Student"]}>
               <StudentDashboard />
             </ProtectedRoute>
           }
@@ -122,7 +122,7 @@ export default function App() {
         <Route
           path="/student/events"
           element={
-            <ProtectedRoute allowedRoles={["Admin", "Organizer", "Student"]}>
+            <ProtectedRoute allowedRoles={["Admin", "Student"]}>
               <StudentEvents />
             </ProtectedRoute>
           }
@@ -130,7 +130,7 @@ export default function App() {
         <Route
           path="/student/events/:id"
           element={
-            <ProtectedRoute allowedRoles={["Admin", "Organizer", "Student"]}>
+            <ProtectedRoute allowedRoles={["Admin", "Student"]}>
               <StudentEventDetail />
             </ProtectedRoute>
           }
@@ -138,7 +138,7 @@ export default function App() {
         <Route
           path="/student/registrations"
           element={
-            <ProtectedRoute allowedRoles={["Admin", "Organizer", "Student"]}>
+            <ProtectedRoute allowedRoles={["Admin", "Student"]}>
               <StudentRegistrations />
             </ProtectedRoute>
           }

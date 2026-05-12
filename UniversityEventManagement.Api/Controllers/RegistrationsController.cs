@@ -5,12 +5,15 @@ using UniversityEventManagement.Application.DTOs;
 
 namespace UniversityEventManagement.Api.Controllers;
 
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class RegistrationsController : ControllerBase
 {
+
     [HttpGet]
+    [Authorize(Policy = "AnyAppRole")]
     public IActionResult Get([FromQuery] int? userId, [FromQuery] int? eventId)
     {
         var query = MockDataStore.Registrations.AsEnumerable();
@@ -30,7 +33,9 @@ public class RegistrationsController : ControllerBase
         return Ok(result);
     }
 
+
     [HttpPost]
+    [Authorize(Policy = "AdminOrStudent")]
     public IActionResult Register(RegisterRequest request)
     {
         var eventItem = MockDataStore.Events.FirstOrDefault(e => e.Id == request.EventId);
@@ -77,7 +82,9 @@ public class RegistrationsController : ControllerBase
         return Ok(AttachEventData(registration));
     }
 
+
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "AdminOrStudent")]
     public IActionResult Cancel(int id)
     {
         var registration = MockDataStore.Registrations.FirstOrDefault(r => r.Id == id);
@@ -100,6 +107,7 @@ public class RegistrationsController : ControllerBase
     }
 
     [HttpPatch("{id:int}/checkin")]
+    [Authorize(Policy = "AdminOrOrganizer")]
     public IActionResult CheckIn(int id)
     {
         var registration = MockDataStore.Registrations.FirstOrDefault(r => r.Id == id);
