@@ -77,8 +77,8 @@ export async function deleteEvent(id) {
 
 // ── REGISTRATIONS ─────────────────────────────────────────────────────────────
 
-export async function getMyRegistrations(userId) {
-  const res = await api.get("/registrations", { params: { userId } });
+export async function getMyRegistrations() {
+  const res = await api.get("/registrations");
 
   return res.data.map((r) => ({
     ...r,
