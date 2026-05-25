@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UniversityEventManagement.Api.Mock;
+using UniversityEventManagement.Application.Interfaces;
 
 namespace UniversityEventManagement.Api.Controllers;
 
@@ -9,15 +9,17 @@ namespace UniversityEventManagement.Api.Controllers;
 [Authorize(Policy = "AdminOnly")]
 public class StatsController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult Get()
+    private readonly IStatsService _statsService;
+
+    public StatsController(IStatsService statsService)
     {
-        return Ok(new
-        {
-            totalEvents = MockDataStore.Events.Count,
-            upcomingEvents = MockDataStore.Events.Count(e => e.Status == "Upcoming"),
-            totalUsers = MockDataStore.Users.Count,
-            totalRegistrations = MockDataStore.Registrations.Count
-        });
+        _statsService = statsService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        var stats = await _statsService.GetAsync();
+        return Ok(stats);
     }
 }

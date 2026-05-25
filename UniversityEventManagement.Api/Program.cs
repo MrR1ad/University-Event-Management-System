@@ -5,6 +5,8 @@ using Microsoft.Identity.Web;
 using Serilog;
 using UniversityEventManagement.Api.Security;
 using UniversityEventManagement.Infrastructure.Data;
+using UniversityEventManagement.Application.Interfaces;
+using UniversityEventManagement.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +62,11 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AnyAppRole", policy =>
         policy.RequireRole("Admin", "Organizer", "Student"));
 });
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IVenueService, VenueService>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IStatsService, StatsService>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

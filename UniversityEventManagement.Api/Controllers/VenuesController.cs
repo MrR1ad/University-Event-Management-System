@@ -1,79 +1,67 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UniversityEventManagement.Api.Mock;
 using UniversityEventManagement.Application.DTOs;
+using UniversityEventManagement.Application.Interfaces;
 
 namespace UniversityEventManagement.Api.Controllers;
-
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class VenuesController : ControllerBase
 {
+    private readonly IVenueService _venueService;
+
+    public VenuesController(IVenueService venueService)
+    {
+        _venueService = venueService;
+    }
+
     [HttpGet]
     [Authorize(Policy = "AnyAppRole")]
-
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(MockDataStore.Venues);
+        var venues = await _venueService.GetAllAsync();
+        return Ok(venues);
     }
 
     [HttpPost]
     [Authorize(Policy = "AdminOnly")]
-    public IActionResult Create(VenueDto request)
+    public async Task<IActionResult> Create(VenueDto request)
     {
-        request.Id = MockDataStore.NextVenueId;
-        MockDataStore.Venues.Add(request);
-
-        return Ok(request);
+        var venue = await _venueService.CreateAsync(request);
+        return Ok(venue);
     }
-
-
 
     [HttpPut("{id:int}")]
     [Authorize(Policy = "AdminOnly")]
-    public IActionResult Update(int id, VenueDto request)
+    public async Task<IActionResult> Update(int id, VenueDto request)
     {
-        var venue = MockDataStore.Venues.FirstOrDefault(v => v.Id == id);
+        var venue = await _venueService.UpdateAsync(id, request);
 
         if (venue is null)
         {
             return NotFound(new { message = "Venue not found." });
-        }
-
-        venue.Name = request.Name;
-        venue.Location = request.Location;
-        venue.Capacity = request.Capacity;
-
-        foreach (var eventItem in MockDataStore.Events.Where(e => e.VenueId == id))
-        {
-            eventItem.VenueName = venue.Name;
         }
 
         return Ok(venue);
     }
 
-
     [HttpDelete("{id:int}")]
     [Authorize(Policy = "AdminOnly")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var venue = MockDataStore.Venues.FirstOrDefault(v => v.Id == id);
+        var result = await _venueService.DeleteAsync(id);
 
-        if (venue is null)
+        if (result == "NotFound")
         {
             return NotFound(new { message = "Venue not found." });
         }
 
-        var venueHasEvents = MockDataStore.Events.Any(e => e.VenueId == id);
-
-        if (venueHasEvents)
+        if (result == "HasEvents")
         {
             return BadRequest(new { message = "Cannot delete venue because events are assigned to it." });
         }
-
-        MockDataStore.Venues.Remove(venue);
 
         return NoContent();
     }

@@ -1,30 +1,37 @@
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UniversityEventManagement.Api.Mock;
 using UniversityEventManagement.Application.DTOs;
+using UniversityEventManagement.Application.Interfaces;
 
 namespace UniversityEventManagement.Api.Controllers;
-
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class EventsController : ControllerBase
 {
-    [HttpGet]
-    [Authorize(Policy = "AnyAppRole")]
-    public IActionResult GetAll()
+    private readonly IEventService _eventService;
+
+    public EventsController(IEventService eventService)
     {
-        return Ok(MockDataStore.Events.OrderBy(e => e.StartDate));
+        _eventService = eventService;
     }
 
-
+    [HttpGet]
+    [Authorize(Policy = "AnyAppRole")]
+    public async Task<IActionResult> GetAll()
+    {
+        var events = await _eventService.GetAllAsync();
+        return Ok(events.OrderBy(e => e.StartDate));
+    }
 
     [HttpGet("{id:int}")]
     [Authorize(Policy = "AnyAppRole")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var eventItem = MockDataStore.Events.FirstOrDefault(e => e.Id == id);
+        var eventItem = await _eventService.GetByIdAsync(id);
 
         if (eventItem is null)
         {
@@ -34,67 +41,96 @@ public class EventsController : ControllerBase
         return Ok(eventItem);
     }
 
-
     [HttpPost]
     [Authorize(Policy = "AdminOrOrganizer")]
-    public IActionResult Create(EventDto request)
+    public async Task<IActionResult> Create(EventDto request)
     {
-        var venue = MockDataStore.Venues.FirstOrDefault(v => v.Id == request.VenueId);
+        var email = GetEmailFromClaims(User);
+        var name = GetNameFromClaims(User, email);
+        var role = GetPrimaryRole();
 
-        request.Id = MockDataStore.NextEventId;
-        request.Registered = 0;
-        request.VenueName = venue?.Name ?? request.VenueName;
-        request.Status = string.IsNullOrWhiteSpace(request.Status) ? "Upcoming" : request.Status;
+        var created = await _eventService.CreateAsync(request, email, name, role);
 
-        MockDataStore.Events.Add(request);
-
-        return CreatedAtAction(nameof(GetById), new { id = request.Id }, request);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
-
 
     [HttpPut("{id:int}")]
     [Authorize(Policy = "AdminOrOrganizer")]
-    public IActionResult Update(int id, EventDto request)
+    public async Task<IActionResult> Update(int id, EventDto request)
     {
-        var existing = MockDataStore.Events.FirstOrDefault(e => e.Id == id);
+        var updated = await _eventService.UpdateAsync(id, request);
 
-        if (existing is null)
+        if (updated is null)
         {
             return NotFound(new { message = "Event not found." });
         }
 
-        var venue = MockDataStore.Venues.FirstOrDefault(v => v.Id == request.VenueId);
-
-        existing.Title = request.Title;
-        existing.Category = request.Category;
-        existing.Description = request.Description;
-        existing.StartDate = request.StartDate;
-        existing.EndDate = request.EndDate;
-        existing.Capacity = request.Capacity;
-        existing.Status = request.Status;
-        existing.VenueId = request.VenueId;
-        existing.VenueName = venue?.Name ?? request.VenueName;
-        existing.OrganizerId = request.OrganizerId;
-        existing.OrganizerName = request.OrganizerName;
-
-        return Ok(existing);
+        return Ok(updated);
     }
-
 
     [HttpDelete("{id:int}")]
     [Authorize(Policy = "AdminOrOrganizer")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var existing = MockDataStore.Events.FirstOrDefault(e => e.Id == id);
+        var deleted = await _eventService.DeleteAsync(id);
 
-        if (existing is null)
+        if (!deleted)
         {
             return NotFound(new { message = "Event not found." });
         }
 
-        MockDataStore.Events.Remove(existing);
-        MockDataStore.Registrations.RemoveAll(r => r.EventId == id);
-
         return NoContent();
+    }
+
+    private string GetPrimaryRole()
+    {
+        if (User.IsInRole("Admin"))
+        {
+            return "Admin";
+        }
+
+        if (User.IsInRole("Organizer"))
+        {
+            return "Organizer";
+        }
+
+        return "Student";
+    }
+
+    private static string GetNameFromClaims(ClaimsPrincipal principal, string email)
+    {
+        var name = principal.FindFirst("name")?.Value
+            ?? principal.Identity?.Name
+            ?? string.Empty;
+
+        return string.IsNullOrWhiteSpace(name) ? email : name;
+    }
+
+    private static string GetEmailFromClaims(ClaimsPrincipal principal)
+    {
+        var email = principal.FindFirst("preferred_username")?.Value
+            ?? principal.FindFirst("upn")?.Value
+            ?? principal.FindFirst(ClaimTypes.Upn)?.Value
+            ?? principal.FindFirst(ClaimTypes.Email)?.Value
+            ?? principal.FindFirst("email")?.Value
+            ?? principal.FindFirst("unique_name")?.Value
+            ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(email) && email.Contains('@'))
+        {
+            return email.Trim().ToLowerInvariant();
+        }
+
+        var name = principal.FindFirst("name")?.Value
+            ?? principal.Identity?.Name
+            ?? string.Empty;
+
+        var match = Regex.Match(
+            name,
+            @"[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}",
+            RegexOptions.IgnoreCase
+        );
+
+        return match.Success ? match.Value.Trim().ToLowerInvariant() : string.Empty;
     }
 }

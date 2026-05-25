@@ -11,9 +11,7 @@ export default function OrganizerDashboard() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    getEvents().then((evts) =>
-      setEvents(evts.filter((e) => e.organizerId === TEMP_ORGANIZER_ID)),
-    );
+    getEvents().then(setEvents);
   }, []);
 
   const totalRegs = events.reduce((s, e) => s + e.registered, 0);
@@ -73,7 +71,7 @@ export default function OrganizerDashboard() {
             </h1>
 
             <Link
-              to="/organizer/events/create"
+              to="/organizer/events/new"
               className="btn"
               style={{
                 background: "white",
@@ -197,7 +195,7 @@ export default function OrganizerDashboard() {
                     >
                       No events yet.{" "}
                       <Link
-                        to="/organizer/events/create"
+                        to="/organizer/events/new"
                         style={{ color: "var(--accent)", fontWeight: 700 }}
                       >
                         Create one →
