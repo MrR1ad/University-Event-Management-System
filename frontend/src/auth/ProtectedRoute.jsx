@@ -5,12 +5,19 @@ import { loginRequest } from "./msalConfig";
 import { getMe } from "../api";
 
 export default function ProtectedRoute({ allowedRoles, children }) {
+  const isE2ETest = import.meta.env.VITE_E2E_TEST === "true";
+
   const isAuthenticated = useIsAuthenticated();
   const { instance, inProgress } = useMsal();
-  const [allowed, setAllowed] = useState(null);
+  const [allowed, setAllowed] = useState(isE2ETest ? true : null);
 
   useEffect(() => {
     async function run() {
+      if (isE2ETest) {
+        setAllowed(true);
+        return;
+      }
+
       if (inProgress !== "none") return;
 
       if (!isAuthenticated) {
@@ -25,7 +32,7 @@ export default function ProtectedRoute({ allowedRoles, children }) {
     }
 
     run();
-  }, [allowedRoles, inProgress, instance, isAuthenticated]);
+  }, [allowedRoles, inProgress, instance, isAuthenticated, isE2ETest]);
 
   if (allowed === null) {
     return <div style={{ padding: 40 }}>Checking access...</div>;

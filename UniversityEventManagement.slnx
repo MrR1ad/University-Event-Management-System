@@ -3,4 +3,6 @@
   <Project Path="UniversityEventManagement.Application/UniversityEventManagement.Application.csproj" />
   <Project Path="UniversityEventManagement.Domain/UniversityEventManagement.Domain.csproj" />
   <Project Path="UniversityEventManagement.Infrastructure/UniversityEventManagement.Infrastructure.csproj" />
+  <Project Path="UniversityEventManagement.IntegrationTests/UniversityEventManagement.IntegrationTests.csproj" />
+  <Project Path="UniversityEventManagement.UnitTests/UniversityEventManagement.UnitTests.csproj" />
 </Solution>
