@@ -20,7 +20,7 @@ export default function OrganizerEventDetail() {
   async function handleCheckIn(regId) {
     await checkInParticipant(regId);
     setRegistrations(rs => rs.map(r => r.id === regId ? { ...r, checkedIn: true } : r));
-    toast('Checked in! ✅');
+    toast('Checked in!');
   }
 
   const filtered = registrations.filter(r =>
