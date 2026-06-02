@@ -5,13 +5,20 @@ import { loginRequest } from "./msalConfig";
 import { getMe } from "../api";
 
 export default function RoleRedirect() {
+  const isE2ETest = import.meta.env.VITE_E2E_TEST === "true";
+
   const isAuthenticated = useIsAuthenticated();
   const { instance, inProgress } = useMsal();
-  const [target, setTarget] = useState(null);
+  const [target, setTarget] = useState(isE2ETest ? "/student" : null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function run() {
+      if (isE2ETest) {
+        setTarget("/student");
+        return;
+      }
+
       if (inProgress !== "none") return;
 
       if (!isAuthenticated) {
@@ -33,7 +40,7 @@ export default function RoleRedirect() {
     }
 
     run();
-  }, [isAuthenticated, inProgress, instance]);
+  }, [isAuthenticated, inProgress, instance, isE2ETest]);
 
   if (target) {
     return <Navigate to={target} replace />;
