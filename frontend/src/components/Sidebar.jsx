@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
 import { getMe } from "../api";
 
@@ -8,35 +8,58 @@ const NAV_SECTIONS = [
     title: "Student",
     roles: ["Admin", "Student"],
     items: [
-      { to: "/student", icon: "📊", label: "Dashboard" },
-      { to: "/student/events", icon: "🎟️", label: "Browse Events" },
-      { to: "/student/registrations", icon: "✅", label: "My Registrations" },
+      { to: "/student", label: "Dashboard" },
+      { to: "/student/events", label: "Browse Events" },
+      { to: "/student/registrations", label: "My Registrations" },
     ],
   },
   {
     title: "Organizer",
     roles: ["Admin", "Organizer"],
     items: [
-      { to: "/organizer", icon: "📊", label: "Dashboard" },
-      { to: "/organizer/events", icon: "📌", label: "My Events" },
-      { to: "/organizer/events/new", icon: "✨", label: "Create Event" },
+      { to: "/organizer", label: "Dashboard" },
+      { to: "/organizer/events", label: "My Events" },
+      { to: "/organizer/events/new", label: "Create Event" },
     ],
   },
   {
     title: "Admin",
     roles: ["Admin"],
     items: [
-      { to: "/admin", icon: "🛡️", label: "Dashboard" },
-      { to: "/admin/events", icon: "📋", label: "All Events" },
-      { to: "/admin/users", icon: "👥", label: "Users" },
-      { to: "/admin/venues", icon: "🏛️", label: "Venues" },
-      { to: "/admin/reports", icon: "📊", label: "Reports" },
+      { to: "/admin", label: "Dashboard" },
+      { to: "/admin/events", label: "All Events" },
+      { to: "/admin/users", label: "Users" },
+      { to: "/admin/venues", label: "Venues" },
+      { to: "/admin/reports", label: "Reports" },
     ],
   },
 ];
 
+const DASHBOARD_ROUTES = ["/student", "/organizer", "/admin"];
+
+function isRouteActive(pathname, itemPath) {
+  if (DASHBOARD_ROUTES.includes(itemPath)) {
+    return pathname === itemPath;
+  }
+
+  if (itemPath === "/organizer/events/new") {
+    return pathname === itemPath;
+  }
+
+  if (itemPath === "/organizer/events") {
+    return (
+      pathname === "/organizer/events" ||
+      (pathname.startsWith("/organizer/events/") &&
+        pathname !== "/organizer/events/new")
+    );
+  }
+
+  return pathname === itemPath || pathname.startsWith(`${itemPath}/`);
+}
+
 export default function Sidebar() {
   const { instance } = useMsal();
+  const location = useLocation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -66,13 +89,15 @@ export default function Sidebar() {
 
   return (
     <aside className="ultra-sidebar">
-      <div className="brand">
-        <div className="ius-logo">IUS</div>
-        <span>Sarajevo</span>
-      </div>
 
-      <div className="user-profile" style={{ marginTop: 0, marginBottom: 24 }}>
+
+      <div
+        className="user-profile"
+        title={`${user?.name || "Signed in user"}\n${user?.email || "No email available"}\nRole: ${role}`}
+        style={{ marginTop: 0, marginBottom: 24 }}
+      >
         <div className="avatar">👤</div>
+
         <div className="user-info" style={{ minWidth: 0 }}>
           <p
             title={user?.name || "Signed in user"}
@@ -85,6 +110,7 @@ export default function Sidebar() {
           >
             {user?.name || "Signed in user"}
           </p>
+
           <span>{role}</span>
         </div>
       </div>
@@ -104,35 +130,30 @@ export default function Sidebar() {
               {section.title}
             </h4>
 
-            {section.items.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `nav-pill ${isActive ? "active" : ""}`
-                }
-              >
-                <span className="icon">{item.icon}</span>
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
+            {section.items.map((item) => {
+              const active = isRouteActive(location.pathname, item.to);
+
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`nav-pill ${active ? "active" : ""}`}
+                >
+                  <span className="icon">{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
         ))}
       </nav>
 
       <button
         type="button"
-        className="nav-pill"
+        className="nav-pill logout-pill"
         onClick={handleLogout}
-        style={{
-          border: "none",
-          marginTop: "auto",
-          background: "rgba(255,255,255,0.65)",
-          width: "100%",
-          fontFamily: "inherit",
-        }}
       >
-        <span className="icon">🚪</span>
+        <span className="icon">↪</span>
         <span>Logout</span>
       </button>
     </aside>

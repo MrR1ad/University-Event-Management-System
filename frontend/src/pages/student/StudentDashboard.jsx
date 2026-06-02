@@ -90,7 +90,7 @@ export default function StudentDashboard() {
                 style={{ borderRadius: 50, fontWeight: 700 }}
                 onClick={() => setShowScheduleModal(true)}
               >
-                📅 Schedule
+                Schedule
               </button>
 
               <button
@@ -98,7 +98,7 @@ export default function StudentDashboard() {
                 style={{ borderRadius: 50, fontWeight: 700 }}
                 onClick={() => setShowRegsModal(true)}
               >
-                🎟 My Registrations
+                My Registrations
               </button>
 
               <Link
@@ -106,39 +106,52 @@ export default function StudentDashboard() {
                 className="btn btn-primary"
                 style={{ borderRadius: 50 }}
               >
-                🔍 Browse Events
+                Browse Events
               </Link>
             </div>
           </div>
 
-          <span
+          <div
             style={{
-              fontSize: "clamp(4rem,8vw,7rem)",
-              animation: "float 3s ease-in-out infinite",
+              width: 110,
+              height: 110,
+              borderRadius: 32,
+              background: "rgba(255,255,255,0.75)",
+              border: "1px solid rgba(0,51,102,0.12)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 14px 30px rgba(0,51,102,0.08)",
+              overflow: "hidden",
             }}
           >
-            🎓
-          </span>
-        </div>
+            <img
+              src="/images/ius-logo.png"
+              alt="IUS logo"
+              style={{
+                width: 86,
+                height: 86,
+                objectFit: "contain",
+              }}
+            />
+          </div>
+      </div>
 
         <div className="stats-grid">
           {[
             {
               label: "Registered",
               value: confirmed.length,
-              icon: "✅",
-              sub: "Confirmed",
+              sub: "Confirmed registrations",
             },
             {
               label: "Waitlisted",
               value: waitlisted.length,
-              icon: "⏳",
               sub: "Pending spots",
             },
             {
               label: "Available Events",
               value: upcoming.length,
-              icon: "📅",
               sub: "Open now",
             },
           ].map((s) => (
@@ -197,7 +210,7 @@ export default function StudentDashboard() {
                       marginBottom: 4,
                     }}
                   >
-                    📅 {formatDate(e.startDate)}
+                    Date: {formatDate(e.startDate)}
                   </div>
 
                   <div
@@ -207,7 +220,7 @@ export default function StudentDashboard() {
                       marginBottom: 16,
                     }}
                   >
-                    📍 {e.venueName}
+                    Venue: {e.venueName}
                   </div>
 
                   <Link
@@ -240,7 +253,7 @@ export default function StudentDashboard() {
           >
             <div className="modal-header-soft">
               <div className="header-icon-title">
-                <span className="modal-emoji">🗓️</span>
+                <span className="modal-emoji"></span>
                 <h3>Weekly Schedule</h3>
               </div>
 
@@ -349,7 +362,7 @@ export default function StudentDashboard() {
           >
             <div className="modal-header-soft">
               <div className="header-icon-title">
-                <span className="modal-emoji">🎟</span>
+                <span className="modal-emoji"></span>
                 <h3>My Registrations</h3>
               </div>
 

@@ -55,7 +55,7 @@ export default function OrganizerEvents() {
 
         <div style={{ marginBottom: 24 }}>
           <input
-            placeholder="🔍  Search events…"
+            placeholder="Search events…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ maxWidth: 320 }}
@@ -113,7 +113,7 @@ export default function OrganizerEvents() {
                     marginBottom: 4,
                   }}
                 >
-                  📅 {formatDate(e.startDate)}
+                  Date: {formatDate(e.startDate)}
                 </div>
 
                 <div
@@ -123,7 +123,7 @@ export default function OrganizerEvents() {
                     marginBottom: 14,
                   }}
                 >
-                  📍 {e.venueName}
+                  Venue: {e.venueName}
                 </div>
 
                 <div className="progress-section">

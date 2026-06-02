@@ -44,13 +44,25 @@ export default function AdminReports() {
 
         <div className="stats-grid">
           {[
-            { label: 'Avg Fill Rate',     value: `${avgFill}%`,  icon: '📈' },
-            { label: 'Total Check-ins',   value: eventReport.reduce((s,e) => s+e.checkedIn, 0), icon: '✅' },
-            { label: 'Active Students',   value: users.filter(u => u.role==='Student' && u.status==='Active').length, icon: '🎓' },
-            { label: 'Active Organizers', value: users.filter(u => u.role==='Organizer').length, icon: '🎪' },
-          ].map(s => (
-            <div key={s.label} className="stat-card">
-              <div style={{ fontSize: '1.5rem', marginBottom: 10 }}>{s.icon}</div>
+            {
+              label: "Avg Fill Rate",
+              value: `${avgFill}%`,
+            },
+            {
+              label: "Total Check-ins",
+              value: eventReport.reduce((s, e) => s + e.checkedIn, 0),
+            },
+            {
+              label: "Active Students",
+              value: users.filter((u) => u.role === "Student" && u.status === "Active")
+                .length,
+            },
+            {
+              label: "Active Organizers",
+              value: users.filter((u) => u.role === "Organizer").length,
+            },
+          ].map((s) => (
+            <div key={s.label} className="stat-card stat-card-clean">
               <div className="stat-card-label">{s.label}</div>
               <div className="stat-card-value">{s.value}</div>
             </div>

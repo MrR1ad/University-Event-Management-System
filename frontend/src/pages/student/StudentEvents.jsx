@@ -34,7 +34,7 @@ export default function StudentEvents() {
         </div>
 
         <div className="filter-row">
-          <input placeholder="🔍  Search events…" value={search}
+          <input placeholder="Search events…" value={search}
             onChange={e => setSearch(e.target.value)} style={{ maxWidth: 280 }} />
           <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} style={{ maxWidth: 180 }}>
             <option value="All">All Categories</option>

@@ -875,3 +875,95 @@ tbody tr:hover {
 .sidebar-nav a {
   text-decoration: none;
 }
+
+
+.logout-pill {
+  border: none;
+  margin-top: auto;
+  background: rgba(255, 255, 255, 0.65);
+  width: 100%;
+  font-family: inherit;
+}
+
+.logout-pill:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--accent);
+}
+
+
+.stat-card-clean {
+  position: relative;
+  overflow: hidden;
+  padding-top: 26px;
+}
+
+.stat-card-accent {
+  width: 42px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  margin-bottom: 18px;
+}
+
+.stat-card-clean .stat-card-label {
+  margin-bottom: 12px;
+}
+
+.stat-card-clean .stat-card-value {
+  font-size: 2.3rem;
+  line-height: 1;
+}
+
+.stat-card-clean .stat-card-sub {
+  margin-top: 10px;
+}
+
+.event-initial {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  text-transform: uppercase;
+}
+
+.event-initial {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  text-transform: uppercase;
+}
+
+.ius-logo-img-wrap {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 51, 102, 0.1);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ius-logo-img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
