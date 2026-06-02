@@ -4,16 +4,13 @@ import DashboardLayout from "../../components/DashboardLayout";
 import { getEvents } from "../../api/index";
 import { StatusBadge, formatDate } from "../../components/EventCard";
 
-const TEMP_ORGANIZER_ID = 1;
 const TEMP_ORGANIZER_NAME = "Organizer";
 
 export default function OrganizerDashboard() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    getEvents().then((evts) =>
-      setEvents(evts.filter((e) => e.organizerId === TEMP_ORGANIZER_ID)),
-    );
+    getEvents().then(setEvents);
   }, []);
 
   const totalRegs = events.reduce((s, e) => s + e.registered, 0);
@@ -65,15 +62,16 @@ export default function OrganizerDashboard() {
                 fontSize: "clamp(1.4rem,3vw,2.2rem)",
                 margin: "0 0 18px",
                 fontWeight: 800,
+                lineHeight: 1.15,
               }}
             >
               Welcome back,
               <br />
-              {TEMP_ORGANIZER_NAME} 🎪
+              {TEMP_ORGANIZER_NAME}
             </h1>
 
             <Link
-              to="/organizer/events/create"
+              to="/organizer/events/new"
               className="btn"
               style={{
                 background: "white",
@@ -82,33 +80,63 @@ export default function OrganizerDashboard() {
                 borderRadius: 50,
               }}
             >
-              + Create Event
+              Create Event
             </Link>
           </div>
 
-          <span
+          <div
             style={{
-              fontSize: "clamp(4rem,8vw,7rem)",
-              animation: "float 3s ease-in-out infinite",
+              width: 110,
+              height: 110,
+              borderRadius: 32,
+              background: "rgba(255,255,255,0.75)",
+              border: "1px solid rgba(0,51,102,0.12)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 14px 30px rgba(0,51,102,0.08)",
+              overflow: "hidden",
             }}
           >
-            🎪
-          </span>
+            <img
+              src="/images/ius-logo.png"
+              alt="IUS logo"
+              style={{
+                width: 86,
+                height: 86,
+                objectFit: "contain",
+              }}
+            />
+          </div>
         </div>
 
         <div className="stats-grid">
           {[
-            { label: "My Events", value: events.length, icon: "📅" },
-            { label: "Upcoming", value: upcoming, icon: "🔔" },
-            { label: "Total Registered", value: totalRegs, icon: "🎟" },
-            { label: "Avg Fill Rate", value: `${avgFill}%`, icon: "📈" },
+            {
+              label: "My Events",
+              value: events.length,
+              sub: "Created events",
+            },
+            {
+              label: "Upcoming",
+              value: upcoming,
+              sub: "Scheduled events",
+            },
+            {
+              label: "Total Registered",
+              value: totalRegs,
+              sub: "Student registrations",
+            },
+            {
+              label: "Avg Fill Rate",
+              value: `${avgFill}%`,
+              sub: "Average capacity used",
+            },
           ].map((s) => (
-            <div key={s.label} className="stat-card">
-              <div style={{ fontSize: "1.5rem", marginBottom: 10 }}>
-                {s.icon}
-              </div>
+            <div key={s.label} className="stat-card stat-card-clean">
               <div className="stat-card-label">{s.label}</div>
               <div className="stat-card-value">{s.value}</div>
+              <div className="stat-card-sub">{s.sub}</div>
             </div>
           ))}
         </div>
@@ -120,6 +148,7 @@ export default function OrganizerDashboard() {
             >
               My Events
             </h2>
+
             <Link to="/organizer/events" className="btn btn-ghost btn-sm">
               View all →
             </Link>
@@ -143,9 +172,11 @@ export default function OrganizerDashboard() {
                     <td style={{ fontWeight: 700, color: "#2d3436" }}>
                       {e.title}
                     </td>
+
                     <td className="text-dim text-sm">
                       {formatDate(e.startDate)}
                     </td>
+
                     <td>
                       <div
                         style={{
@@ -161,25 +192,31 @@ export default function OrganizerDashboard() {
                           <div
                             className="capacity-fill"
                             style={{
-                              width: `${Math.min(100, Math.round((e.registered / e.capacity) * 100))}%`,
+                              width: `${Math.min(
+                                100,
+                                Math.round((e.registered / e.capacity) * 100),
+                              )}%`,
                               background: "var(--accent)",
                             }}
                           />
                         </div>
+
                         <span className="text-sm">
                           {e.registered}/{e.capacity}
                         </span>
                       </div>
                     </td>
+
                     <td>
                       <StatusBadge status={e.status} />
                     </td>
+
                     <td>
                       <Link
                         to={`/organizer/events/${e.id}`}
                         className="btn btn-ghost btn-sm"
                       >
-                        Detail →
+                        Details →
                       </Link>
                     </td>
                   </tr>
@@ -197,7 +234,7 @@ export default function OrganizerDashboard() {
                     >
                       No events yet.{" "}
                       <Link
-                        to="/organizer/events/create"
+                        to="/organizer/events/new"
                         style={{ color: "var(--accent)", fontWeight: 700 }}
                       >
                         Create one →

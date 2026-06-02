@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UniversityEventManagement.Api.Mock;
 using UniversityEventManagement.Application.DTOs;
+using UniversityEventManagement.Application.Interfaces;
 
 namespace UniversityEventManagement.Api.Controllers;
 
@@ -10,22 +10,23 @@ namespace UniversityEventManagement.Api.Controllers;
 [Authorize(Policy = "AdminOnly")]
 public class UsersController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult GetAll()
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
     {
-        return Ok(MockDataStore.Users);
+        _userService = userService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var users = await _userService.GetAllAsync();
+        return Ok(users);
     }
 
     [HttpPatch("{id:int}/role")]
-    public IActionResult UpdateRole(int id, RoleUpdateRequest request)
+    public async Task<IActionResult> UpdateRole(int id, RoleUpdateRequest request)
     {
-        var user = MockDataStore.Users.FirstOrDefault(u => u.Id == id);
-
-        if (user is null)
-        {
-            return NotFound(new { message = "User not found." });
-        }
-
         var allowedRoles = new[] { "Student", "Organizer", "Admin" };
 
         if (!allowedRoles.Contains(request.Role))
@@ -33,23 +34,25 @@ public class UsersController : ControllerBase
             return BadRequest(new { message = "Invalid role." });
         }
 
-        user.Role = request.Role;
-
-        return Ok(user);
-    }
-
-    [HttpDelete("{id:int}")]
-    public IActionResult Delete(int id)
-    {
-        var user = MockDataStore.Users.FirstOrDefault(u => u.Id == id);
+        var user = await _userService.UpdateRoleAsync(id, request);
 
         if (user is null)
         {
             return NotFound(new { message = "User not found." });
         }
 
-        MockDataStore.Users.Remove(user);
-        MockDataStore.Registrations.RemoveAll(r => r.UserId == id);
+        return Ok(user);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var deleted = await _userService.DeleteAsync(id);
+
+        if (!deleted)
+        {
+            return NotFound(new { message = "User not found." });
+        }
 
         return NoContent();
     }

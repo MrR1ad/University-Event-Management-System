@@ -59,7 +59,7 @@ export default function StudentEventDetail() {
       setMyReg({ ...reg, event, eventId });
       setEvent((e) => ({ ...e, registered: e.registered + 1 }));
 
-      toast(isFull ? "⏳ Added to waitlist!" : "✅ Successfully registered!");
+      toast(isFull ? "⏳ Added to waitlist!" : "Successfully registered!");
     } finally {
       setLoading(false);
     }
@@ -285,9 +285,22 @@ export default function StudentEventDetail() {
                     marginBottom: 14,
                   }}
                 >
-                  <div style={{ fontSize: "1.5rem", marginBottom: 8 }}>
-                    {myReg.status === "Confirmed" ? "✅" : "⏳"}
-                  </div>
+                <div
+                  className="status-marker"
+                  style={{
+                    margin: "0 auto 10px",
+                    background:
+                      myReg.status === "Confirmed"
+                        ? "rgba(0, 184, 148, 0.12)"
+                        : "rgba(243, 156, 18, 0.12)",
+                    color:
+                      myReg.status === "Confirmed"
+                        ? "#00b894"
+                        : "#f39c12",
+                  }}
+                >
+                  {myReg.status === "Confirmed" ? "Confirmed" : "Waitlisted"}
+                </div>
 
                   <div
                     style={{
@@ -348,8 +361,8 @@ export default function StudentEventDetail() {
                 {loading
                   ? "Processing…"
                   : isFull
-                    ? "⏳ Join Waitlist"
-                    : "✅ Register Now"}
+                    ? "Join Waitlist"
+                    : "Register Now"}
               </button>
             )}
 

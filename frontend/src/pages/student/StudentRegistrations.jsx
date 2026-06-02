@@ -17,6 +17,20 @@ const CATEGORY_COLORS = {
   Social: "#fd79a8",
 };
 
+function getCategoryCode(category) {
+  const codes = {
+    Workshop: "WK",
+    Seminar: "SM",
+    Competition: "CO",
+    Cultural: "CU",
+    Sports: "SP",
+    Academic: "AC",
+    Social: "SO",
+  };
+
+  return codes[category] || "EV";
+}
+
 export default function StudentRegistrations() {
   const [registrations, setRegistrations] = useState([]);
   const [filter, setFilter] = useState("All");
@@ -115,7 +129,9 @@ export default function StudentRegistrations() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {filtered.map((r) => {
-              const color = CATEGORY_COLORS[r.event?.category] || "#74b9ff";
+              const category = r.event?.category;
+              const color = CATEGORY_COLORS[category] || "#74b9ff";
+              const categoryCode = getCategoryCode(category);
 
               return (
                 <div
@@ -130,19 +146,15 @@ export default function StudentRegistrations() {
                   }}
                 >
                   <div
+                    className="event-initial"
                     style={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: 18,
-                      background: color + "22",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "1.5rem",
-                      flexShrink: 0,
+                      background: `${color}22`,
+                      color,
+                      borderColor: `${color}55`,
                     }}
+                    title={category || "Event"}
                   >
-                    🎟
+                    {categoryCode}
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -155,11 +167,22 @@ export default function StudentRegistrations() {
                         marginBottom: 6,
                       }}
                     >
-                      <span className="badge badge-blue">
-                        {r.event?.category}
-                      </span>
                       <span
-                        className={`badge ${r.status === "Confirmed" ? "badge-green" : "badge-yellow"}`}
+                        className="badge"
+                        style={{
+                          background: `${color}20`,
+                          color,
+                        }}
+                      >
+                        {category || "Event"}
+                      </span>
+
+                      <span
+                        className={`badge ${
+                          r.status === "Confirmed"
+                            ? "badge-green"
+                            : "badge-yellow"
+                        }`}
                       >
                         {r.status}
                       </span>
@@ -178,11 +201,11 @@ export default function StudentRegistrations() {
 
                     <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
                       <span style={{ fontSize: "0.8rem", color: "#888" }}>
-                        📅 {formatDate(r.event?.startDate)}
+                        Date: {formatDate(r.event?.startDate)}
                       </span>
 
                       <span style={{ fontSize: "0.8rem", color: "#888" }}>
-                        📍 {r.event?.venueName}
+                        Venue: {r.event?.venueName}
                       </span>
                     </div>
                   </div>

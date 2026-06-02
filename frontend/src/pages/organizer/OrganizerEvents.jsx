@@ -23,9 +23,7 @@ export default function OrganizerEvents() {
   const { toast } = useToast();
 
   useEffect(() => {
-    getEvents().then((evts) =>
-      setEvents(evts.filter((e) => e.organizerId === TEMP_ORGANIZER_ID)),
-    );
+    getEvents().then(setEvents);
   }, []);
 
   const filtered = events.filter((e) =>
@@ -50,14 +48,14 @@ export default function OrganizerEvents() {
             <p className="page-subtitle">Manage your created events</p>
           </div>
 
-          <Link to="/organizer/events/create" className="btn btn-primary">
+          <Link to="/organizer/events/new" className="btn btn-primary">
             + Create Event
           </Link>
         </div>
 
         <div style={{ marginBottom: 24 }}>
           <input
-            placeholder="🔍  Search events…"
+            placeholder="Search events…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ maxWidth: 320 }}
@@ -115,7 +113,7 @@ export default function OrganizerEvents() {
                     marginBottom: 4,
                   }}
                 >
-                  📅 {formatDate(e.startDate)}
+                  Date: {formatDate(e.startDate)}
                 </div>
 
                 <div
@@ -125,7 +123,7 @@ export default function OrganizerEvents() {
                     marginBottom: 14,
                   }}
                 >
-                  📍 {e.venueName}
+                  Venue: {e.venueName}
                 </div>
 
                 <div className="progress-section">
@@ -184,7 +182,7 @@ export default function OrganizerEvents() {
             >
               No events yet.{" "}
               <Link
-                to="/organizer/events/create"
+                to="/organizer/events/new"
                 style={{ color: "var(--accent)", fontWeight: 700 }}
               >
                 Create one →
